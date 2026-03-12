@@ -3,5 +3,6 @@
  * for serving via /api/uploads/[...path].
  */
 export function uploadUrl(filePath: string): string {
-  return `/api/uploads/${filePath.replace(/^\.?\/?uploads\//, "")}`;
+  // Strip any prefix ending with "uploads/" (handles ./uploads/, /app/uploads/, etc.)
+  return `/api/uploads/${filePath.replace(/^.*uploads\//, "")}`;
 }
