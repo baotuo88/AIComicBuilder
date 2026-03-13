@@ -383,6 +383,8 @@ export default function StoryboardPage() {
               status={shot.status}
               dialogues={shot.dialogues || []}
               onUpdate={() => fetchProject(project.id)}
+              batchGeneratingFrames={generatingFrames}
+              batchGeneratingVideo={generatingVideos}
             />
           ))}
         </div>
