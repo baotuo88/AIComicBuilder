@@ -100,6 +100,10 @@ export async function POST(
     return handleShotSplitStream(projectId, modelConfig);
   }
 
+  if (action === "single_shot_rewrite") {
+    return handleSingleShotRewrite(projectId, payload, modelConfig);
+  }
+
   if (action === "batch_frame_generate") {
     return handleBatchFrameGenerate(projectId, modelConfig);
   }
@@ -477,6 +481,91 @@ async function handleShotSplitStream(
   });
 
   return result.toTextStreamResponse();
+}
+
+// --- single_shot_rewrite: regenerate text fields for one shot ---
+
+async function handleSingleShotRewrite(
+  projectId: string,
+  payload?: Record<string, unknown>,
+  modelConfig?: ModelConfig
+) {
+  const shotId = payload?.shotId as string;
+  if (!shotId) {
+    return NextResponse.json({ error: "No shotId provided" }, { status: 400 });
+  }
+  if (!modelConfig?.text) {
+    return NextResponse.json({ error: "No text model configured" }, { status: 400 });
+  }
+
+  const [shot] = await db.select().from(shots).where(eq(shots.id, shotId));
+  if (!shot) {
+    return NextResponse.json({ error: "Shot not found" }, { status: 404 });
+  }
+
+  const projectCharacters = await db
+    .select()
+    .from(characters)
+    .where(eq(characters.projectId, projectId));
+  const characterDescriptions = projectCharacters
+    .map((c) => `${c.name}: ${c.description}`)
+    .join("\n");
+
+  const model = createLanguageModel(modelConfig.text);
+
+  const prompt = `You are a storyboard director. Rewrite the text fields for a single shot so the descriptions are vivid, safe for AI image generation, and free of any potentially sensitive content.
+
+Current shot (sequence ${shot.sequence}):
+- Scene description: ${shot.prompt || ""}
+- Start frame: ${shot.startFrameDesc || ""}
+- End frame: ${shot.endFrameDesc || ""}
+- Motion script: ${shot.motionScript || ""}
+- Camera direction: ${shot.cameraDirection || "static"}
+- Duration: ${shot.duration}s
+
+Character references:
+${characterDescriptions || "none"}
+
+Return ONLY a JSON object (no markdown fences) with these fields:
+{
+  "prompt": "rewritten scene description",
+  "startFrameDesc": "rewritten start frame description",
+  "endFrameDesc": "rewritten end frame description",
+  "motionScript": "rewritten motion script in time-segmented format (0-Xs: ... Xs-Ys: ...)",
+  "cameraDirection": "camera direction (keep original or adjust)"
+}
+
+IMPORTANT: Keep the same scene, characters, and narrative intent. Only rephrase to avoid safety filter triggers. Match the language of the original text.`;
+
+  try {
+    const { text } = await import("ai").then(({ generateText }) =>
+      generateText({ model, prompt, temperature: 0.7 })
+    );
+
+    const parsed = JSON.parse(extractJSON(text)) as {
+      prompt: string;
+      startFrameDesc: string;
+      endFrameDesc: string;
+      motionScript: string;
+      cameraDirection: string;
+    };
+
+    await db
+      .update(shots)
+      .set({
+        prompt: parsed.prompt,
+        startFrameDesc: parsed.startFrameDesc,
+        endFrameDesc: parsed.endFrameDesc,
+        motionScript: parsed.motionScript,
+        cameraDirection: parsed.cameraDirection,
+      })
+      .where(eq(shots.id, shotId));
+
+    return NextResponse.json({ shotId, status: "ok", ...parsed });
+  } catch (err) {
+    console.error(`[SingleShotRewrite] Error for shot ${shotId}:`, err);
+    return NextResponse.json({ shotId, status: "error", error: extractErrorMessage(err) }, { status: 500 });
+  }
 }
 
 // --- batch_frame_generate: sequential frame generation with continuity chain ---

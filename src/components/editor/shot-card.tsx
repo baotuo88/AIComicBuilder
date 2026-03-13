@@ -24,6 +24,7 @@ import {
   Sparkles,
   Copy,
   Check,
+  RefreshCw,
 } from "lucide-react";
 
 interface Dialogue {
@@ -90,6 +91,7 @@ export function ShotCard({
   const [editDuration, setEditDuration] = useState(duration);
   const [generatingFrames, setGeneratingFrames] = useState(false);
   const [generatingVideo, setGeneratingVideo] = useState(false);
+  const [rewritingText, setRewritingText] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
   const [videoRatio, setVideoRatio] = useState("16:9");
@@ -153,6 +155,25 @@ export function ShotCard({
       toast.error(err instanceof Error ? err.message : t("common.generationFailed"));
     }
     setGeneratingVideo(false);
+  }
+
+  async function handleRewriteText() {
+    setRewritingText(true);
+    try {
+      await apiFetch(`/api/projects/${projectId}/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "single_shot_rewrite",
+          payload: { shotId: id },
+          modelConfig: getModelConfig(),
+        }),
+      });
+      onUpdate();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("common.generationFailed"));
+    }
+    setRewritingText(false);
   }
 
   function handleCopyPrompt(e: React.MouseEvent) {
@@ -410,13 +431,28 @@ export function ShotCard({
             </div>
           )}
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <InlineModelPicker capability="text" />
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleRewriteText}
+              disabled={rewritingText || isGeneratingFrames || isGeneratingVideo}
+            >
+              {rewritingText ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <RefreshCw className="h-3.5 w-3.5" />
+              )}
+              {rewritingText ? t("common.generating") : t("shot.rewriteText")}
+            </Button>
+            <div className="h-4 w-px bg-[--border-subtle]" />
             <InlineModelPicker capability="image" />
             <Button
               size="sm"
               variant="outline"
               onClick={handleGenerateFrames}
-              disabled={isGeneratingFrames || isGeneratingVideo}
+              disabled={isGeneratingFrames || isGeneratingVideo || rewritingText}
             >
               {isGeneratingFrames ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
