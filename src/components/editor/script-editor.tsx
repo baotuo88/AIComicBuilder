@@ -10,6 +10,7 @@ import { Sparkles, Save, Loader2, FileText, Lightbulb } from "lucide-react";
 import { InlineModelPicker } from "@/components/editor/model-selector";
 import { apiFetch } from "@/lib/api-fetch";
 import { useModelGuard } from "@/hooks/use-model-guard";
+import { toast } from "sonner";
 
 export function ScriptEditor() {
   const t = useTranslations();
@@ -75,6 +76,7 @@ export function ScriptEditor() {
       await fetchProject(project.id);
     } catch (err) {
       console.error("Script generate error:", err);
+      toast.error(t("common.generationFailed"));
     }
 
     setGenerating(false);

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiFetch } from "@/lib/api-fetch";
+import { toast } from "sonner";
 
 export default function PreviewPage() {
   const t = useTranslations();
@@ -58,6 +59,7 @@ export default function PreviewPage() {
       await res.json();
     } catch (err) {
       console.error("Video assemble error:", err);
+      toast.error(t("common.generationFailed"));
     }
     setAssembling(false);
     await fetchProject(project.id);

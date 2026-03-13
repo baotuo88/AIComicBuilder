@@ -11,7 +11,9 @@
     "retry": "再試行",
     "back": "戻る",
     "language": "言語",
-    "switchLanguage": "言語を切替"
+    "switchLanguage": "言語を切替",
+    "generationFailed": "生成に失敗しました。モデル設定を確認して再試行してください。",
+    "batchPartialFailed": "一部のアイテムの生成に失敗しました。後でもう一度お試しください。"
   },
   "dashboard": {
     "title": "マイプロジェクト",
@@ -75,6 +77,7 @@
     "duration": "再生時間（秒）",
     "firstFrame": "最初のフレーム",
     "lastFrame": "最後のフレーム",
+    "cameraDirection": "カメラ方向",
     "dialogue": "セリフ",
     "noShots": "まだショットがありません。先に脚本からショットを生成してください。"
   },

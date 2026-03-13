@@ -11,6 +11,7 @@ import { InlineModelPicker } from "@/components/editor/model-selector";
 import { useModelGuard } from "@/hooks/use-model-guard";
 import { VideoRatioPicker } from "@/components/editor/video-ratio-picker";
 import { apiFetch } from "@/lib/api-fetch";
+import { toast } from "sonner";
 import {
   Loader2,
   ChevronDown,
@@ -122,6 +123,7 @@ export function ShotCard({
       onUpdate();
     } catch (err) {
       console.error("Frame generate error:", err);
+      toast.error(t("common.generationFailed"));
     }
     setGeneratingFrames(false);
   }
@@ -142,6 +144,7 @@ export function ShotCard({
       onUpdate();
     } catch (err) {
       console.error("Video generate error:", err);
+      toast.error(t("common.generationFailed"));
     }
     setGeneratingVideo(false);
   }

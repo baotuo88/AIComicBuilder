@@ -12,6 +12,7 @@ import { Sparkles, Loader2 } from "lucide-react";
 import { InlineModelPicker } from "@/components/editor/model-selector";
 import { apiFetch } from "@/lib/api-fetch";
 import { useModelGuard } from "@/hooks/use-model-guard";
+import { toast } from "sonner";
 
 interface CharacterCardProps {
   id: string;
@@ -66,6 +67,7 @@ export function CharacterCard({
       await response.json();
     } catch (err) {
       console.error("Character image error:", err);
+      toast.error(t("common.generationFailed"));
     }
     setGenerating(false);
     onUpdate();

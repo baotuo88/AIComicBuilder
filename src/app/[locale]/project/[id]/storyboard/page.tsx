@@ -20,6 +20,7 @@ import {
 import { InlineModelPicker } from "@/components/editor/model-selector";
 import { VideoRatioPicker } from "@/components/editor/video-ratio-picker";
 import { apiFetch } from "@/lib/api-fetch";
+import { toast } from "sonner";
 
 type StepStatus = "pending" | "active" | "completed";
 
@@ -145,6 +146,7 @@ export default function StoryboardPage() {
       }
     } catch (err) {
       console.error("Shot split error:", err);
+      toast.error(t("common.generationFailed"));
     }
 
     setGenerating(false);
@@ -165,9 +167,13 @@ export default function StoryboardPage() {
           modelConfig: getModelConfig(),
         }),
       });
-      await response.json();
+      const data = await response.json() as { results: Array<{ status: string }> };
+      if (data.results?.some((r) => r.status === "error")) {
+        toast.warning(t("common.batchPartialFailed"));
+      }
     } catch (err) {
       console.error("Batch frame generate error:", err);
+      toast.error(t("common.generationFailed"));
     }
 
     setGeneratingFrames(false);
@@ -189,9 +195,13 @@ export default function StoryboardPage() {
           modelConfig: getModelConfig(),
         }),
       });
-      await response.json();
+      const data = await response.json() as { results: Array<{ status: string }> };
+      if (data.results?.some((r) => r.status === "error")) {
+        toast.warning(t("common.batchPartialFailed"));
+      }
     } catch (err) {
       console.error("Batch video generate error:", err);
+      toast.error(t("common.generationFailed"));
     }
 
     setGeneratingVideos(false);

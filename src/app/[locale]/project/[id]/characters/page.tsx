@@ -10,6 +10,7 @@ import { Users, Sparkles, ImageIcon, Loader2 } from "lucide-react";
 import { InlineModelPicker } from "@/components/editor/model-selector";
 import { apiFetch } from "@/lib/api-fetch";
 import { useModelGuard } from "@/hooks/use-model-guard";
+import { toast } from "sonner";
 
 export default function CharactersPage() {
   const t = useTranslations();
@@ -50,6 +51,7 @@ export default function CharactersPage() {
       }
     } catch (err) {
       console.error("Character extract error:", err);
+      toast.error(t("common.generationFailed"));
     }
 
     setExtracting(false);
@@ -71,9 +73,13 @@ export default function CharactersPage() {
         }),
       });
 
-      await response.json();
+      const data = await response.json() as { results: Array<{ status: string }> };
+      if (data.results?.some((r) => r.status === "error")) {
+        toast.warning(t("common.batchPartialFailed"));
+      }
     } catch (err) {
       console.error("Batch character image error:", err);
+      toast.error(t("common.generationFailed"));
     }
 
     setGeneratingImages(false);

@@ -11,7 +11,9 @@
     "retry": "Retry",
     "back": "Back",
     "language": "Language",
-    "switchLanguage": "Switch Language"
+    "switchLanguage": "Switch Language",
+    "generationFailed": "Generation failed. Please check your model configuration and try again.",
+    "batchPartialFailed": "Some items failed to generate. Please try again."
   },
   "dashboard": {
     "title": "My Projects",
@@ -75,6 +77,7 @@
     "duration": "Duration (seconds)",
     "firstFrame": "First Frame",
     "lastFrame": "Last Frame",
+    "cameraDirection": "Camera Direction",
     "dialogue": "Dialogue",
     "noShots": "No shots yet. Generate shots from the script first."
   },

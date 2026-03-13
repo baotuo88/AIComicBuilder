@@ -11,7 +11,9 @@
     "retry": "重试",
     "back": "返回",
     "language": "语言",
-    "switchLanguage": "切换语言"
+    "switchLanguage": "切换语言",
+    "generationFailed": "生成失败，请检查模型配置后重试",
+    "batchPartialFailed": "部分项目生成失败，请稍后重试"
   },
   "dashboard": {
     "title": "我的项目",
@@ -75,6 +77,7 @@
     "duration": "时长 (秒)",
     "firstFrame": "首帧",
     "lastFrame": "尾帧",
+    "cameraDirection": "镜头方向",
     "dialogue": "台词",
     "noShots": "还没有分镜，先生成分镜"
   },
