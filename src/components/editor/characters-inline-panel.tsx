@@ -40,6 +40,7 @@ export function CharactersInlinePanel({
 
   const [imageModelRef, setImageModelRef] = useState<ModelRef | null>(() => defaultImageModel);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
+  const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
   const storageKey = `charPanel:${projectId}`;
   const anyMissingRef = characters.some((c) => !c.referenceImage);
@@ -143,12 +144,15 @@ export function CharactersInlinePanel({
               return (
                 <div key={char.id} className="flex flex-col items-center gap-1">
                   {/* Thumbnail */}
-                  <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-[--border-subtle] bg-[--surface]">
+                  <div
+                    className={`relative h-12 w-12 overflow-hidden rounded-lg border border-[--border-subtle] bg-[--surface] ${char.referenceImage ? "cursor-zoom-in" : ""}`}
+                    onClick={() => char.referenceImage && setPreviewSrc(uploadUrl(char.referenceImage))}
+                  >
                     {char.referenceImage ? (
                       <img
                         src={uploadUrl(char.referenceImage)}
                         alt={char.name}
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-cover transition-opacity hover:opacity-80"
                       />
                     ) : isGenerating ? (
                       <div className="flex h-full w-full items-center justify-center">
@@ -190,6 +194,24 @@ export function CharactersInlinePanel({
             >
               {t("charactersPanelEdit")} →
             </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Preview lightbox */}
+      {previewSrc && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm"
+          onClick={() => setPreviewSrc(null)}
+        >
+          <div className="relative max-h-[90vh] max-w-[90vw]" onClick={(e) => e.stopPropagation()}>
+            <img src={previewSrc} alt="Preview" className="max-h-[85vh] rounded-xl" />
+            <button
+              onClick={() => setPreviewSrc(null)}
+              className="absolute -right-3 -top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-sm font-bold shadow-lg hover:scale-110 transition-transform"
+            >
+              &times;
+            </button>
           </div>
         </div>
       )}
