@@ -44,8 +44,11 @@ interface KanbanColumn {
   icon: React.ReactNode;
 }
 
-function classifyShot(shot: KanbanShot) {
-  const hasFrame = !!(shot.sceneRefFrame || shot.firstFrame || shot.lastFrame);
+function classifyShot(shot: KanbanShot, mode: "keyframe" | "reference") {
+  // In reference mode, only sceneRefFrame counts as "has frame"
+  const hasFrame = mode === "reference"
+    ? !!shot.sceneRefFrame
+    : !!(shot.firstFrame || shot.lastFrame);
   const hasVideoPrompt = !!shot.videoPrompt;
   const hasVideo = !!shot.videoUrl;
   if (!hasFrame) return "frames";
@@ -72,10 +75,10 @@ export function ShotKanban({
   const t = useTranslations("project");
   const tCommon = useTranslations("common");
 
-  const frameShots = shots.filter((s) => classifyShot(s) === "frames");
-  const promptShots = shots.filter((s) => classifyShot(s) === "prompt");
-  const videoShots = shots.filter((s) => classifyShot(s) === "video");
-  const doneShots = shots.filter((s) => classifyShot(s) === "done");
+  const frameShots = shots.filter((s) => classifyShot(s, generationMode) === "frames");
+  const promptShots = shots.filter((s) => classifyShot(s, generationMode) === "prompt");
+  const videoShots = shots.filter((s) => classifyShot(s, generationMode) === "video");
+  const doneShots = shots.filter((s) => classifyShot(s, generationMode) === "done");
 
   const framesGenerating = generationMode === "reference" ? generatingSceneFrames : generatingFrames;
   const framesAction = generationMode === "reference" ? onBatchSceneFrames : onBatchFrames;
