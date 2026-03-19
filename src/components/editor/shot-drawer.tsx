@@ -393,7 +393,7 @@ export function ShotDrawer({
                   <div
                     key={i}
                     className={`overflow-hidden rounded-lg border border-[--border-subtle] cursor-pointer hover:opacity-80 transition-opacity ${generationMode === "reference" ? "w-full" : "flex-1"}`}
-                    style={{ height: 64 }}
+                    style={{ aspectRatio: "16/9" }}
                     onClick={() => asset.src && setPreviewSrc(uploadUrl(asset.src))}
                   >
                     {asset.src

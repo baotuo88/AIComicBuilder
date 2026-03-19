@@ -145,7 +145,7 @@ export function CharactersInlinePanel({
                 <div key={char.id} className="flex flex-col items-center gap-1">
                   {/* Thumbnail */}
                   <div
-                    className={`relative h-12 w-12 overflow-hidden rounded-lg border border-[--border-subtle] bg-[--surface] ${char.referenceImage ? "cursor-zoom-in" : ""}`}
+                    className={`relative h-20 w-20 overflow-hidden rounded-lg border border-[--border-subtle] bg-[--surface] ${char.referenceImage ? "cursor-zoom-in" : ""}`}
                     onClick={() => char.referenceImage && setPreviewSrc(uploadUrl(char.referenceImage))}
                   >
                     {char.referenceImage ? (
@@ -169,7 +169,7 @@ export function CharactersInlinePanel({
                     }`} />
                   </div>
                   {/* Name */}
-                  <span className="max-w-[52px] truncate text-[10px] text-[--text-muted]">{char.name}</span>
+                  <span className="max-w-[80px] truncate text-[11px] text-[--text-muted]">{char.name}</span>
                   {/* Generate button (only when no image) */}
                   {!char.referenceImage && (
                     <button
